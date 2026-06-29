@@ -4,11 +4,13 @@
 
 **The most complete Prometheus exporter for MikroTik RouterOS**
 
+[![CI](https://github.com/MikroJit-Technologies/mikrotik-exporter/actions/workflows/ci.yml/badge.svg)](https://github.com/MikroJit-Technologies/mikrotik-exporter/actions/workflows/ci.yml)
 [![Go](https://img.shields.io/badge/Go-1.22-00ADD8?style=flat-square&logo=go&logoColor=white)](https://golang.org)
 [![RouterOS](https://img.shields.io/badge/RouterOS-v6%20%2F%20v7-293239?style=flat-square&logo=mikrotik&logoColor=white)](https://mikrotik.com)
 [![Docker](https://img.shields.io/badge/Docker-ready-2496ED?style=flat-square&logo=docker&logoColor=white)](https://hub.docker.com)
 [![Grafana](https://img.shields.io/badge/Grafana-dashboard%20included-F46800?style=flat-square&logo=grafana&logoColor=white)]()
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/MikroJit-Technologies/mikrotik-exporter?style=flat-square)](https://github.com/MikroJit-Technologies/mikrotik-exporter/releases)
 
 Single binary · Multi-device · RouterOS v6 + v7 · Grafana dashboard included
 
