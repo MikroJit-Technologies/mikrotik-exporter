@@ -34,10 +34,22 @@ Most MikroTik exporters cover interface stats and stop there. This one covers ev
 | **wireguard** | Peer last-handshake age, RX/TX bytes per peer |
 | **capsman** | Client count per AP/SSID, signal strength, TX/RX rate |
 | **health** | Board temperature, voltage, fan speed |
+| **routes** | Route table size — total, active, static, BGP, OSPF, connected |
+| **conntrack** | Connection tracking table — total, TCP/UDP/ICMP, established, time-wait |
 
 **Multi-device** — one exporter, as many routers as you have.  
 **Graceful** — if one collector or one device fails, everything else still runs.  
 **Zero deps** — single static binary, runs in scratch container or bare metal.
+
+---
+
+## Docker Image
+
+```bash
+docker pull ghcr.io/mikrojit-technologies/mikrotik-exporter:latest
+```
+
+Multi-arch: `linux/amd64` · `linux/arm64` · `linux/arm/v7`
 
 ---
 
@@ -108,7 +120,7 @@ docker compose up -d
 | `devices[].skip_verify` | `false` | Skip TLS certificate verification |
 | `devices[].collectors` | all | List of collectors to enable for this device |
 
-Available collectors: `system` `interface` `bgp` `ospf` `dhcp` `firewall` `queue` `wireguard` `capsman` `health`
+Available collectors: `system` `interface` `bgp` `ospf` `dhcp` `firewall` `queue` `wireguard` `capsman` `health` `routes` `conntrack`
 
 Set `CONFIG_FILE` env var to use a different config path (default: `config.yml`).
 
@@ -176,6 +188,23 @@ mikrotik_capsman_client_signal_dbm{..., interface, ssid, mac}         gauge
 
 # Health
 mikrotik_health_value{..., name, type}                                gauge
+
+# Routes
+mikrotik_routes_total{device, address}                                gauge
+mikrotik_routes_active{device, address}                               gauge
+mikrotik_routes_static{device, address}                               gauge
+mikrotik_routes_bgp{device, address}                                  gauge
+mikrotik_routes_ospf{device, address}                                 gauge
+mikrotik_routes_dynamic{device, address}                              gauge
+mikrotik_routes_connect{device, address}                              gauge
+
+# Connection Tracking
+mikrotik_conntrack_total{device, address}                             gauge
+mikrotik_conntrack_established{device, address}                       gauge
+mikrotik_conntrack_time_wait{device, address}                         gauge
+mikrotik_conntrack_tcp{device, address}                               gauge
+mikrotik_conntrack_udp{device, address}                               gauge
+mikrotik_conntrack_icmp{device, address}                              gauge
 ```
 
 ---

@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.1.0] — 2026-06-29
+
+### Added
+- `routes` collector — route table size by type (total, active, static, BGP, OSPF, connected, dynamic)
+- `conntrack` collector — connection tracking table (total, TCP/UDP/ICMP, established, time-wait)
+- Multi-arch Docker image published to `ghcr.io` (amd64, arm64, arm/v7)
+- GitHub issue templates (bug report, feature request)
+- Pull request template
+- Security policy (`SECURITY.md`)
+- CI builds linux/arm/v7 binary
+
 ## [1.0.0] — 2026-06-29
 
 ### Added

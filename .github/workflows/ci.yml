@@ -3,12 +3,17 @@ name: CI
 on:
   push:
     branches: [main]
+    tags: ["v*"]
   pull_request:
     branches: [main]
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
   build:
-    name: Build & Lint
+    name: Build & Vet
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,45 +26,105 @@ jobs:
       - name: Download dependencies
         run: go mod download
 
-      - name: Build (linux/amd64)
-        run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o mikrotik-exporter-amd64 .
-
-      - name: Build (linux/arm64)
-        run: CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -o mikrotik-exporter-arm64 .
-
       - name: Vet
         run: go vet ./...
+
+      - name: Build (linux/amd64)
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o dist/mikrotik-exporter-linux-amd64 .
+
+      - name: Build (linux/arm64)
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -o dist/mikrotik-exporter-linux-arm64 .
+
+      - name: Build (linux/arm/v7)
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 go build -ldflags="-s -w" -o dist/mikrotik-exporter-linux-armv7 .
+
+      - name: Build (darwin/arm64)
+        run: CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -o dist/mikrotik-exporter-darwin-arm64 .
+
+      - name: Build (windows/amd64)
+        run: CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o dist/mikrotik-exporter-windows-amd64.exe .
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: binaries
-          path: mikrotik-exporter-*
+          path: dist/
 
-  release:
-    name: Release
+  docker:
+    name: Docker Image
     runs-on: ubuntu-latest
     needs: build
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  release:
+    name: GitHub Release
+    runs-on: ubuntu-latest
+    needs: [build, docker]
     if: startsWith(github.ref, 'refs/tags/v')
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-go@v5
+      - name: Download binaries
+        uses: actions/download-artifact@v4
         with:
-          go-version: "1.22"
-          cache: true
-
-      - name: Build release binaries
-        run: |
-          CGO_ENABLED=0 GOOS=linux   GOARCH=amd64 go build -ldflags="-s -w" -o mikrotik-exporter-linux-amd64 .
-          CGO_ENABLED=0 GOOS=linux   GOARCH=arm64 go build -ldflags="-s -w" -o mikrotik-exporter-linux-arm64 .
-          CGO_ENABLED=0 GOOS=darwin  GOARCH=arm64 go build -ldflags="-s -w" -o mikrotik-exporter-darwin-arm64 .
-          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o mikrotik-exporter-windows-amd64.exe .
+          name: binaries
+          path: dist/
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: mikrotik-exporter-*
+          files: dist/*
           generate_release_notes: true
+          body: |
+            ## Docker
+
+            ```bash
+            docker pull ghcr.io/mikrojit-technologies/mikrotik-exporter:${{ github.ref_name }}
+            ```
+
+            ## Quick Start
+
+            ```bash
+            cp config.example.yml config.yml
+            docker compose up -d
+            ```
+
+            See [README](https://github.com/MikroJit-Technologies/mikrotik-exporter#readme) for full documentation.

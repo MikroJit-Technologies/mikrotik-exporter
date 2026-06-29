@@ -36,6 +36,8 @@ func newMikrotikCollector(cfg *Config) *mikrotikCollector {
 			newWireGuardCollector(),
 			newCapsManCollector(),
 			newHealthCollector(),
+			newRoutesCollector(),
+			newConntrackCollector(),
 		},
 		upDesc: prometheus.NewDesc(
 			"mikrotik_up",
