@@ -1,0 +1,271 @@
+{
+  "__inputs": [],
+  "__requires": [],
+  "annotations": { "list": [] },
+  "description": "MikroTik RouterOS — system, interfaces, BGP, OSPF, WireGuard, DHCP, queues, health",
+  "editable": true,
+  "graphTooltip": 1,
+  "id": null,
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "title": "Overview",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [{ "options": { "0": { "text": "DOWN" }, "1": { "text": "UP" } }, "type": "value" }],
+          "thresholds": { "steps": [{ "color": "red", "value": 0 }, { "color": "green", "value": 1 }] }
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+      "id": 2,
+      "options": { "colorMode": "background", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [{ "expr": "mikrotik_up", "legendFormat": "{{device}}" }],
+      "title": "Device Status",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "unit": "percent", "thresholds": { "steps": [{ "color": "green", "value": 0 }, { "color": "yellow", "value": 70 }, { "color": "red", "value": 90 }] } } },
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+      "id": 3,
+      "options": { "colorMode": "background", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [{ "expr": "mikrotik_system_cpu_load_percent", "legendFormat": "{{device}}" }],
+      "title": "CPU Load",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "unit": "percent", "thresholds": { "steps": [{ "color": "green", "value": 0 }, { "color": "yellow", "value": 70 }, { "color": "red", "value": 90 }] } } },
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+      "id": 4,
+      "options": { "colorMode": "background", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [{ "expr": "100 * (1 - mikrotik_system_memory_free_bytes / mikrotik_system_memory_total_bytes)", "legendFormat": "{{device}}" }],
+      "title": "Memory Usage",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "unit": "dtdurations" } },
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 1 },
+      "id": 5,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [{ "expr": "mikrotik_system_uptime_seconds", "legendFormat": "{{device}}" }],
+      "title": "Uptime",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "unit": "short", "thresholds": { "steps": [{ "color": "red", "value": 0 }, { "color": "green", "value": 1 }] } } },
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 1 },
+      "id": 6,
+      "options": { "colorMode": "background", "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [{ "expr": "sum(mikrotik_bgp_peer_established) by (device)", "legendFormat": "{{device}}" }],
+      "title": "BGP Sessions Up",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "unit": "short" } },
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 1 },
+      "id": 7,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [{ "expr": "sum(mikrotik_interface_running) by (device)", "legendFormat": "{{device}}" }],
+      "title": "Interfaces Up",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+      "id": 10,
+      "title": "System Resources",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100, "custom": { "lineWidth": 2 } } },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "id": 11,
+      "options": { "legend": { "displayMode": "list" } },
+      "targets": [{ "expr": "mikrotik_system_cpu_load_percent", "legendFormat": "{{device}} CPU" }],
+      "title": "CPU Load (%)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100, "custom": { "lineWidth": 2 } } },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "id": 12,
+      "options": { "legend": { "displayMode": "list" } },
+      "targets": [{ "expr": "100 * (1 - mikrotik_system_memory_free_bytes / mikrotik_system_memory_total_bytes)", "legendFormat": "{{device}} Memory" }],
+      "title": "Memory Usage (%)",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 },
+      "id": 20,
+      "title": "Interfaces",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "unit": "Bps", "custom": { "lineWidth": 1 } } },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 15 },
+      "id": 21,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
+      "targets": [{ "expr": "rate(mikrotik_interface_rx_bytes_total[2m])", "legendFormat": "{{device}} {{interface}} RX" }],
+      "title": "Interface RX Throughput",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "unit": "Bps", "custom": { "lineWidth": 1 } } },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 15 },
+      "id": 22,
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
+      "targets": [{ "expr": "rate(mikrotik_interface_tx_bytes_total[2m])", "legendFormat": "{{device}} {{interface}} TX" }],
+      "title": "Interface TX Throughput",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 23 },
+      "id": 30,
+      "title": "Routing — BGP & OSPF",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "State" }, "properties": [{ "id": "custom.width", "value": 90 }, { "id": "mappings", "value": [{ "options": { "0": { "color": "red", "text": "Down" }, "1": { "color": "green", "text": "Up" } }, "type": "value" }] }, { "id": "custom.displayMode", "value": "color-background" }] }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+      "id": 31,
+      "options": { "sortBy": [{ "displayName": "Device" }] },
+      "targets": [{
+        "expr": "mikrotik_bgp_peer_established",
+        "format": "table",
+        "instant": true,
+        "legendFormat": ""
+      }],
+      "title": "BGP Peers",
+      "transformations": [{ "id": "organize", "options": { "renameByName": { "device": "Device", "peer": "Peer", "remote_as": "Remote AS", "remote_address": "Address", "Value": "State" } } }],
+      "type": "table"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "State" }, "properties": [{ "id": "custom.width", "value": 90 }, { "id": "mappings", "value": [{ "options": { "0": { "color": "red", "text": "Down" }, "1": { "color": "green", "text": "Full" } }, "type": "value" }] }, { "id": "custom.displayMode", "value": "color-background" }] }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
+      "id": 32,
+      "targets": [{
+        "expr": "mikrotik_ospf_neighbor_full",
+        "format": "table",
+        "instant": true
+      }],
+      "title": "OSPF Neighbors",
+      "transformations": [{ "id": "organize", "options": { "renameByName": { "device": "Device", "router_id": "Router ID", "interface": "Interface", "neighbor_address": "Neighbor", "Value": "State" } } }],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 32 },
+      "id": 40,
+      "title": "WireGuard",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Last Handshake" }, "properties": [{ "id": "unit", "value": "s" }, { "id": "thresholds", "value": { "steps": [{ "color": "green", "value": 0 }, { "color": "yellow", "value": 150 }, { "color": "red", "value": 180 }] } }, { "id": "custom.displayMode", "value": "color-background" }] },
+          { "matcher": { "id": "byName", "options": "RX" }, "properties": [{ "id": "unit", "value": "bytes" }] },
+          { "matcher": { "id": "byName", "options": "TX" }, "properties": [{ "id": "unit", "value": "bytes" }] }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 33 },
+      "id": 41,
+      "targets": [{
+        "expr": "mikrotik_wireguard_peer_last_handshake_seconds",
+        "format": "table",
+        "instant": true
+      }],
+      "title": "WireGuard Peers",
+      "transformations": [{ "id": "organize", "options": { "renameByName": { "device": "Device", "interface": "Interface", "public_key": "Public Key", "endpoint": "Endpoint", "Value": "Last Handshake" } } }],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 41 },
+      "id": 50,
+      "title": "DHCP & Health",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": { "unit": "short" } },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 42 },
+      "id": 51,
+      "targets": [{
+        "expr": "mikrotik_dhcp_lease_count",
+        "format": "table",
+        "instant": true
+      }],
+      "title": "DHCP Leases",
+      "transformations": [{ "id": "organize", "options": { "renameByName": { "device": "Device", "server": "Server", "status": "Status", "Value": "Count" } } }],
+      "type": "table"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": { "defaults": {} },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 42 },
+      "id": 52,
+      "targets": [{
+        "expr": "mikrotik_health_value",
+        "format": "table",
+        "instant": true
+      }],
+      "title": "Hardware Health",
+      "transformations": [{ "id": "organize", "options": { "renameByName": { "device": "Device", "name": "Sensor", "type": "Type", "Value": "Value" } } }],
+      "type": "table"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 38,
+  "tags": ["mikrotik", "network", "routeros"],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "hide": 0,
+        "includeAll": false,
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "type": "datasource"
+      }
+    ]
+  },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "MikroTik RouterOS",
+  "uid": "mikrotik-routeros",
+  "version": 1
+}

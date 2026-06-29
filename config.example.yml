@@ -1,0 +1,17 @@
+listen_address: ":9090"
+
+devices:
+  - name: "core-router"
+    address: "192.168.88.1:8728"
+    user: "prometheus"
+    password: "your-password"
+    tls: false
+    # collectors: [system, interface, bgp, ospf, dhcp, firewall, queue, wireguard, capsman, health]
+
+  - name: "edge-router"
+    address: "10.0.0.1:8729"
+    user: "prometheus"
+    password: "your-password"
+    tls: true
+    skip_verify: false
+    collectors: [system, interface, bgp, wireguard]
